@@ -5,11 +5,13 @@ from payments.models import Payment  # si lo necesitas en otro serializer
 from django.db import transaction
 # Serializer para ítems de orden (solo lectura)
 class OrderItemSerializer(serializers.ModelSerializer):
-    product = ProductSerializer(read_only=True)
-
+    product_name = serializers.CharField(source='product.name', read_only=True)
+    product_image = serializers.ImageField(source='product.image', read_only=True)
+    
     class Meta:
         model = OrderItem
-        fields = ['product', 'quantity', 'price']
+        fields = ['id', 'product', 'product_name', 'product_image', 'quantity', 'price']
+
 
 
 # Serializer para crear ítems
@@ -22,17 +24,26 @@ class OrderCreateItemSerializer(serializers.ModelSerializer):
 # Serializer para mostrar órdenes completas
 class OrderSerializer(serializers.ModelSerializer):
     items = OrderItemSerializer(many=True, read_only=True)
-
+    user_email = serializers.EmailField(source='user.email', read_only=True)
+    user_name = serializers.CharField(source='user.get_full_name', read_only=True)
+    username = serializers.CharField(source='user.username', read_only=True)
+    
     class Meta:
         model = Order
-        fields = ['id', 'user', 'created_at', 'is_paid', 'total_price', 'shipping_address', 'items']
-        read_only_fields = ['user']
+        fields = [
+            'id', 'user', 'user_email', 'user_name', 'username', 'created_at', 
+            'is_paid', 'total_price', 'shipping_address', 'status', 'items'
+        ]
+        read_only_fields = ['id', 'created_at', 'user']
 
 class OrderCreateItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = OrderItem
         fields = ['product', 'quantity', 'price']
-
+class OrderStatusUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Order
+        fields = ['status']
 
 class OrderCreateSerializer(serializers.ModelSerializer):
     items = OrderCreateItemSerializer(many=True)
