@@ -117,3 +117,27 @@ class UserAdminDeleteView(generics.DestroyAPIView):
     queryset = CustomUser.objects.all()
     serializer_class = UserAdminSerializer
     permission_classes = [permissions.IsAdminUser]
+
+# users/views.py - Agregar al final del archivo
+
+from rest_framework.views import APIView
+from rest_framework.permissions import IsAuthenticated
+
+# Serializer para usuario actual
+class CurrentUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomUser
+        fields = ['id', 'username', 'email', 'first_name', 'last_name', 
+                 'role', 'is_active', 'is_staff', 'date_joined']
+        read_only_fields = ['id', 'date_joined']
+
+# Vista para obtener usuario actual
+class CurrentUserView(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def get(self, request):
+        """
+        Devuelve los datos del usuario autenticado actualmente
+        """
+        serializer = CurrentUserSerializer(request.user)
+        return Response(serializer.data)
