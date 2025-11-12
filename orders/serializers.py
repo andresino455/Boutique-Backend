@@ -3,16 +3,17 @@ from .models import Order, OrderItem
 from products.serializers import ProductSerializer
 from payments.models import Payment  # si lo necesitas en otro serializer
 from django.db import transaction
-# Serializer para ítems de orden (solo lectura)
+
+
 class OrderItemSerializer(serializers.ModelSerializer):
     product_name = serializers.CharField(source='product.name', read_only=True)
     product_image = serializers.ImageField(source='product.image', read_only=True)
+    product_price = serializers.DecimalField(source='product.price', read_only=True, max_digits=10, decimal_places=2)
     
     class Meta:
         model = OrderItem
-        fields = ['id', 'product', 'product_name', 'product_image', 'quantity', 'price']
-
-
+        fields = ['id', 'product', 'product_name', 'product_image', 'product_price', 'quantity', 'price']
+        read_only_fields = ['id']
 
 # Serializer para crear ítems
 class OrderCreateItemSerializer(serializers.ModelSerializer):

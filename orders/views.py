@@ -15,6 +15,20 @@ from rest_framework.response import Response
 from .models import Order, OrderItem
 from .serializers import OrderSerializer, OrderCreateSerializer, OrderStatusUpdateSerializer
 
+
+# orders/views.py - Asegúrate de que el queryset incluya prefetch_related
+class UserOrderListView(generics.ListAPIView):
+    serializer_class = OrderSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    
+    def get_queryset(self):
+        return Order.objects.filter(
+            user=self.request.user
+        ).select_related('user').prefetch_related(
+            'items__product'  
+        ).order_by('-created_at')
+    
+
 class OrderCreateView(generics.CreateAPIView):
     serializer_class = OrderCreateSerializer
     permission_classes = [permissions.IsAuthenticated]
