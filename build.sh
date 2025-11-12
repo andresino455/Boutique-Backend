@@ -6,8 +6,8 @@ echo "📦 Instalando dependencias..."
 pip install --upgrade pip
 pip install -r requirements.txt
 
-echo "📚 Descargando datos de NLTK..."
-python -c "import nltk; nltk.download('stopwords'); nltk.download('punkt'); nltk.download('wordnet')"
+echo "📚 Configurando NLTK..."
+python nltk_setup.py
 
 echo "📁 Recolectando archivos estáticos..."
 python manage.py collectstatic --no-input
